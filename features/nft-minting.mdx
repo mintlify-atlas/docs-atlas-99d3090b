@@ -1,0 +1,74 @@
+---
+title: "NFT minting"
+description: "Mint and view NFTs through the ELO Token Demo gallery"
+---
+
+ELO Token Demo includes an NFT minting interface built on Moralis and ethers.js. You can mint NFTs on the Rinkeby testnet and browse your collection in the gallery.
+
+## Prerequisites
+
+- A connected Web3 wallet (see [Wallet integration](/features/wallet))
+- Your wallet set to **Rinkeby** (chain ID 4)
+- ETH on Rinkeby to cover the mint price and gas
+
+<Warning>
+  The NFT contract targets Rinkeby (chain ID `0x4`), not BSC Testnet. Make sure your wallet is on Rinkeby before minting, or the transaction will be rejected.
+</Warning>
+
+## Minting NFTs
+
+<Steps>
+  <Step title="Connect your wallet">
+    Click **Connect Wallet** and approve the connection. The mint page requires an active wallet session to read contract state and sign the mint transaction.
+  </Step>
+
+  <Step title="Navigate to /mint">
+    Go to `/mint`. The page loads a mint card that fetches live data from the ERC-721 contract on Rinkeby via Moralis:
+
+    - **Total supply** — maximum number of NFTs in the collection
+    - **Remaining** — how many are left to mint
+    - **Minting cost** — price per NFT in ETH
+    - **Per wallet** — up to 20 NFTs per wallet address
+  </Step>
+
+  <Step title="Select an amount">
+    Use the slider on the mint card to choose how many NFTs to mint. The slider range is **1 to 20**. The total cost updates as you adjust the amount (amount × minting cost per NFT).
+  </Step>
+
+  <Step title="Click Mint">
+    Click the **Mint** button. The app calls `mintToken(numberOfTokens)` on the ERC-721 contract via `Moralis.executeFunction()`, attaching the required ETH value. Confirm the transaction in your wallet.
+
+    The button is disabled if:
+    - No wallet is connected
+    - The collection is sold out
+    - The presale has not started and the public sale has not opened
+  </Step>
+
+  <Step title="Wait for confirmation">
+    The app displays status alerts as the transaction progresses:
+
+    - **Transaction hash** — the transaction has been broadcast to the network
+    - **Transaction done successfully** — the receipt has been received
+    - **Transaction is ended** — the block has been confirmed
+  </Step>
+</Steps>
+
+## Viewing your NFTs
+
+After minting, navigate to `/nfts` or `/gallery` to view your collection.
+
+The `/nfts` route uses the `NFTBalance` component, which calls `useNFTBalances()` from Moralis to fetch all NFTs owned by the connected wallet address. Each NFT card shows:
+
+- The NFT image (with a placeholder fallback if the image fails to load)
+- The NFT name and contract address
+- Actions: view on block explorer, transfer to another address, or list on OpenSea (OpenSea integration is planned)
+
+The `/gallery` route displays a browsable collection of all NFTs in the project's curated list (`nft.json`), paginated at 54 items per page. Clicking any NFT opens a detail dialog showing its name, description, and trait attributes.
+
+## Transferring NFTs
+
+From the `/nfts` page, click the **Transfer** icon on any NFT card to open the transfer modal. Enter the receiver's wallet address and, for ERC-1155 tokens, the amount to send. Click **Send** to execute the transfer via `Moralis.transfer()`.
+
+<Note>
+  Moralis is used throughout the minting flow for contract reads (`executeFunction`), event listening (`onAccountsChanged`, `onChainChanged`), and NFT balance queries (`useNFTBalances`). An active Moralis app ID and server URL are required in the environment configuration.
+</Note>

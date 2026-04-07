@@ -1,0 +1,82 @@
+---
+title: "Staking"
+description: "Stake ELO tokens to earn rewards"
+---
+
+The staking interface lets you deposit ELO tokens into a staking pool to earn more ELO as a return for holding. 25% of the total ELO supply — **250,000,000 ELO** — is allocated for staking rewards.
+
+<Note>
+  Staking is a planned feature. The staking UI at `/stake` is available as a preview, but the staking smart contract has not yet been deployed. The APR, wallet balance, staked amount, and earned rewards displayed in the pool card are placeholder values (`0.000%`, `0.0 $`).
+</Note>
+
+## Prerequisites
+
+- A connected Web3 wallet (see [Wallet integration](/features/wallet))
+- ELO tokens in your wallet
+- Your wallet approved to interact with the staking contract (approval step required before first stake)
+
+## How to stake
+
+<Steps>
+  <Step title="Connect your wallet">
+    Click **Connect Wallet** and approve the connection. The staking page shows your wallet address at the bottom once connected.
+  </Step>
+
+  <Step title="Navigate to /stake">
+    Go to `/stake`. The page displays staking instructions and the staking pool card.
+  </Step>
+
+  <Step title="Approve the staking contract">
+    Before staking for the first time, you must approve the staking contract to spend your ELO tokens. Click **Approve** and confirm the ERC-20 approval transaction in your wallet. Wait for it to confirm on-chain.
+
+    <Note>
+      If you do not see an **Approve** button, your wallet address may already be approved for the staking contract.
+    </Note>
+  </Step>
+
+  <Step title="Enter an amount to stake">
+    Type the amount of ELO you want to stake in the **Amount to stake** input field on the staking pool card.
+  </Step>
+
+  <Step title="Click Stake">
+    Click the **Stake** button. Confirm the transaction in your wallet and wait for it to confirm.
+  </Step>
+</Steps>
+
+## Checking your balance
+
+After staking, your staked balance appears at the top of the staking card under **Staked**. If your balance shows `0.0` after a successful transaction:
+
+- Refresh the page — on-chain balance updates can take a few seconds to propagate
+- Verify that the correct wallet address is connected (visible at the bottom of the staking page)
+
+## Unstaking
+
+<Steps>
+  <Step title="Check your staked balance">
+    Confirm you have a non-zero **Staked** amount on the pool card before attempting to unstake.
+  </Step>
+
+  <Step title="Click Claim & Unstake">
+    Click the **Claim & Unstake** button. This withdraws both your staked ELO principal and any accumulated rewards in a single transaction. Confirm in your wallet and wait for the transaction to confirm.
+  </Step>
+</Steps>
+
+## Staking pool details
+
+The staking pool card displays four metrics:
+
+| Metric | Description |
+|--------|-------------|
+| APR | Annual percentage rate for the pool (drops over time as more participants join) |
+| Wallet balance | Your current ELO balance in the connected wallet |
+| Staked | Total ELO you have deposited into the pool |
+| Earned | Rewards accumulated since your last claim |
+
+<Warning>
+  Estimated APRs decrease over time as the total staked amount in the pool grows. The APR shown is an estimate and not a guaranteed rate.
+</Warning>
+
+## Tokenomics context
+
+250,000,000 ELO (25% of total supply) is reserved for staking rewards. See the [Token presale](/features/presale) page for the full tokenomics breakdown.

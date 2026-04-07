@@ -1,0 +1,599 @@
+---
+title: "Launchpad API"
+description: "Create and manage presale campaigns through the ELO launchpad API"
+---
+
+All launchpad endpoints are served under the base path `/presale/launchpad/`.
+
+<Note>
+  Presales created via `POST /addpad` are **unverified by default** (`verified: false`). They will not appear in the verified listing endpoints until manually verified.
+</Note>
+
+---
+
+## GET /presale/launchpad/all
+
+Returns all **verified** presales for a given chain.
+
+### Query parameters
+
+<ParamField query="chainId" type="number" required>
+  The numeric chain/network ID to filter presales by.
+</ParamField>
+
+### Example
+
+<CodeGroup>
+
+```bash cURL
+curl --request GET \
+  --url 'http://localhost:8082/presale/launchpad/all?chainId=56'
+```
+
+```json Response
+[
+  {
+    "_id": "64a1f2c3e4b0a1b2c3d4e5f6",
+    "token_name": "Example Token",
+    "token_symbol": "EXT",
+    "presale_addr": "0xabc123...",
+    "softcap": 50,
+    "hardcap": 100,
+    "verified": true,
+    "network": 56
+  }
+]
+```
+
+</CodeGroup>
+
+---
+
+## GET /presale/launchpad/allboth
+
+Returns **all** presales for a given chain, regardless of verification status.
+
+### Query parameters
+
+<ParamField query="chainId" type="number" required>
+  The numeric chain/network ID to filter presales by.
+</ParamField>
+
+### Example
+
+<CodeGroup>
+
+```bash cURL
+curl --request GET \
+  --url 'http://localhost:8082/presale/launchpad/allboth?chainId=56'
+```
+
+```json Response
+[
+  {
+    "_id": "64a1f2c3e4b0a1b2c3d4e5f6",
+    "token_name": "Example Token",
+    "token_symbol": "EXT",
+    "verified": false,
+    "network": 56
+  }
+]
+```
+
+</CodeGroup>
+
+---
+
+## GET /presale/launchpad/pendings
+
+Returns **unverified** presales for a given chain.
+
+### Query parameters
+
+<ParamField query="chainId" type="number" required>
+  The numeric chain/network ID to filter presales by.
+</ParamField>
+
+### Example
+
+<CodeGroup>
+
+```bash cURL
+curl --request GET \
+  --url 'http://localhost:8082/presale/launchpad/pendings?chainId=56'
+```
+
+```json Response
+[
+  {
+    "_id": "64a1f2c3e4b0a1b2c3d4e5f6",
+    "token_name": "Pending Token",
+    "token_symbol": "PND",
+    "verified": false,
+    "network": 56
+  }
+]
+```
+
+</CodeGroup>
+
+---
+
+## GET /presale/launchpad/pendingall
+
+Returns **all unverified** presales across every chain.
+
+### Example
+
+<CodeGroup>
+
+```bash cURL
+curl --request GET \
+  --url 'http://localhost:8082/presale/launchpad/pendingall'
+```
+
+```json Response
+[
+  {
+    "_id": "64a1f2c3e4b0a1b2c3d4e5f6",
+    "token_name": "Pending Token",
+    "network": 56,
+    "verified": false
+  },
+  {
+    "_id": "64a1f2c3e4b0a1b2c3d4e5f7",
+    "token_name": "Another Pending",
+    "network": 1,
+    "verified": false
+  }
+]
+```
+
+</CodeGroup>
+
+---
+
+## GET /presale/launchpad/page
+
+Returns a paginated list of **verified** presales for a given chain. Only a subset of fields is returned per record.
+
+### Query parameters
+
+<ParamField query="chainId" type="number" required>
+  The numeric chain/network ID to filter presales by.
+</ParamField>
+
+<ParamField query="currentPage" type="number" required>
+  The 1-based page number to retrieve.
+</ParamField>
+
+<ParamField query="pageCount" type="number" required>
+  Number of records to return per page.
+</ParamField>
+
+### Response fields per record
+
+Each record in the array contains: `_id`, `logoURL`, `presale_addr`, `token_name`, `token_symbol`, `token_presale_rate`, `softcap`, `hardcap`, `liquidityPercent`, `lockupTime`, `starttime`, `endtime`, `presaletype`.
+
+### Example
+
+<CodeGroup>
+
+```bash cURL
+curl --request GET \
+  --url 'http://localhost:8082/presale/launchpad/page?chainId=56&currentPage=1&pageCount=10'
+```
+
+```json Response
+[
+  {
+    "_id": "64a1f2c3e4b0a1b2c3d4e5f6",
+    "logoURL": "https://example.com/logo.png",
+    "presale_addr": "0xabc123...",
+    "token_name": "Example Token",
+    "token_symbol": "EXT",
+    "token_presale_rate": 1000,
+    "softcap": 50,
+    "hardcap": 100,
+    "liquidityPercent": 60,
+    "lockupTime": 365,
+    "starttime": "2024-02-01T00:00:00.000Z",
+    "endtime": "2024-02-15T00:00:00.000Z",
+    "presaletype": true
+  }
+]
+```
+
+</CodeGroup>
+
+---
+
+## GET /presale/launchpad/myzone
+
+Returns a paginated list of **verified** presales belonging to a specific owner wallet. Returns the same field subset as `/page`.
+
+### Query parameters
+
+<ParamField query="owner" type="string" required>
+  The wallet address of the token owner.
+</ParamField>
+
+<ParamField query="chainId" type="number" required>
+  The numeric chain/network ID. Currently unused in the filter but required by convention.
+</ParamField>
+
+<ParamField query="currentPage" type="number" required>
+  The 1-based page number to retrieve.
+</ParamField>
+
+<ParamField query="pageCount" type="number" required>
+  Number of records to return per page.
+</ParamField>
+
+### Example
+
+<CodeGroup>
+
+```bash cURL
+curl --request GET \
+  --url 'http://localhost:8082/presale/launchpad/myzone?owner=0xabc123...&chainId=56&currentPage=1&pageCount=5'
+```
+
+```json Response
+[
+  {
+    "_id": "64a1f2c3e4b0a1b2c3d4e5f6",
+    "logoURL": "https://example.com/logo.png",
+    "presale_addr": "0xabc123...",
+    "token_name": "My Token",
+    "token_symbol": "MTK",
+    "softcap": 50,
+    "hardcap": 100,
+    "starttime": "2024-02-01T00:00:00.000Z",
+    "endtime": "2024-02-15T00:00:00.000Z"
+  }
+]
+```
+
+</CodeGroup>
+
+---
+
+## GET /presale/launchpad/:id
+
+Returns a single presale by its MongoDB document ID, scoped to a chain.
+
+### Path parameters
+
+<ParamField path="id" type="string" required>
+  The MongoDB `_id` of the presale document.
+</ParamField>
+
+### Query parameters
+
+<ParamField query="chainId" type="number" required>
+  The numeric chain/network ID. Must match the presale's recorded network.
+</ParamField>
+
+### Example
+
+<CodeGroup>
+
+```bash cURL
+curl --request GET \
+  --url 'http://localhost:8082/presale/launchpad/64a1f2c3e4b0a1b2c3d4e5f6?chainId=56'
+```
+
+```json Response
+[
+  {
+    "_id": "64a1f2c3e4b0a1b2c3d4e5f6",
+    "token_name": "Example Token",
+    "token_symbol": "EXT",
+    "presale_addr": "0xabc123...",
+    "network": 56,
+    "verified": true
+  }
+]
+```
+
+</CodeGroup>
+
+---
+
+## POST /presale/launchpad/addpad
+
+Create a new presale campaign. The record is saved with `verified: false` and will not appear in verified listing endpoints until reviewed.
+
+### Request body
+
+**Token details**
+
+<ParamField body="token_owner" type="string" required>
+  Wallet address of the token/presale owner.
+</ParamField>
+
+<ParamField body="presale_addr" type="string" required>
+  On-chain address of the presale contract.
+</ParamField>
+
+<ParamField body="token_name" type="string" required>
+  Full name of the token (e.g. `"Example Token"`).
+</ParamField>
+
+<ParamField body="token_symbol" type="string" required>
+  Ticker symbol of the token (e.g. `"EXT"`).
+</ParamField>
+
+<ParamField body="token_addr" type="string" required>
+  On-chain address of the ERC-20 token contract.
+</ParamField>
+
+<ParamField body="token_decimal" type="number" required>
+  Token decimal places (e.g. `18`).
+</ParamField>
+
+<ParamField body="token_supply" type="number" required>
+  Total token supply.
+</ParamField>
+
+<ParamField body="token_presale_rate" type="number">
+  Number of tokens per base currency unit during the presale.
+</ParamField>
+
+<ParamField body="token_listing_rate" type="number">
+  Number of tokens per base currency unit at DEX listing.
+</ParamField>
+
+**Sale configuration**
+
+<ParamField body="softcap" type="number" required>
+  Minimum fundraising goal in base currency units.
+</ParamField>
+
+<ParamField body="hardcap" type="number">
+  Maximum fundraising cap in base currency units.
+</ParamField>
+
+<ParamField body="starttime" type="string" required>
+  ISO 8601 date-time string for when the presale opens.
+</ParamField>
+
+<ParamField body="endtime" type="string" required>
+  ISO 8601 date-time string for when the presale closes.
+</ParamField>
+
+<ParamField body="minBuy" type="number" required>
+  Minimum purchase amount per wallet in base currency units.
+</ParamField>
+
+<ParamField body="maxBuy" type="number">
+  Maximum purchase amount per wallet in base currency units.
+</ParamField>
+
+<ParamField body="iswhitelist" type="boolean">
+  Whether the presale is restricted to whitelisted addresses.
+</ParamField>
+
+<ParamField body="unsold" type="boolean">
+  Whether unsold tokens are burned (`true`) or refunded (`false`).
+</ParamField>
+
+<ParamField body="presaletype" type="boolean" required>
+  Presale type flag (e.g. `true` for standard, `false` for fairlaunch).
+</ParamField>
+
+<ParamField body="network" type="number" required>
+  Numeric chain/network ID (e.g. `56` for BNB Chain, `1` for Ethereum).
+</ParamField>
+
+**Liquidity & lockup**
+
+<ParamField body="liquidityPercent" type="number" required>
+  Percentage of raised funds to add to DEX liquidity (e.g. `60`).
+</ParamField>
+
+<ParamField body="lockupTime" type="number" required>
+  Liquidity lock duration in days.
+</ParamField>
+
+**Vesting (optional)**
+
+<ParamField body="useVestingCont" type="boolean" required default="false">
+  Enable presale contributor vesting.
+</ParamField>
+
+<ParamField body="ves_firstReleasePresale" type="number">
+  Percentage of tokens released immediately after presale ends. Required when `useVestingCont` is `true`.
+</ParamField>
+
+<ParamField body="ves_vestingPeriod" type="number">
+  Vesting cycle length in days.
+</ParamField>
+
+<ParamField body="ves_presaleTokenRelease" type="number">
+  Percentage of tokens released each vesting cycle.
+</ParamField>
+
+**Team vesting (optional)**
+
+<ParamField body="useTeamVest" type="boolean" required default="false">
+  Enable team token vesting.
+</ParamField>
+
+<ParamField body="team_totalTeamVest" type="number">
+  Total number of tokens allocated for the team. Required when `useTeamVest` is `true`.
+</ParamField>
+
+<ParamField body="team_firstTokenReleaseMinute" type="number">
+  Minutes after presale end before the first team token release.
+</ParamField>
+
+<ParamField body="team_firstTokenReleasePercent" type="number">
+  Percentage of team tokens released in the first release.
+</ParamField>
+
+<ParamField body="team_vestingPeriod" type="number">
+  Team vesting cycle length in days.
+</ParamField>
+
+<ParamField body="team_teamTokenRelease" type="number">
+  Percentage of team tokens released each vesting cycle.
+</ParamField>
+
+**Project info**
+
+<ParamField body="logoURL" type="string" required>
+  URL of the project logo image.
+</ParamField>
+
+<ParamField body="websiteURL" type="string" required>
+  URL of the project website.
+</ParamField>
+
+<ParamField body="description" type="string">
+  Text description of the project.
+</ParamField>
+
+<ParamField body="facebookURL" type="string">Facebook page URL.</ParamField>
+<ParamField body="twitterURL" type="string">Twitter/X profile URL.</ParamField>
+<ParamField body="githubURL" type="string">GitHub repository URL.</ParamField>
+<ParamField body="telegramURL" type="string">Telegram group/channel URL.</ParamField>
+<ParamField body="instagramURL" type="string">Instagram profile URL.</ParamField>
+<ParamField body="discordURL" type="string">Discord server invite URL.</ParamField>
+<ParamField body="redditURL" type="string">Reddit community URL.</ParamField>
+
+### Example
+
+<CodeGroup>
+
+```bash cURL
+curl --request POST \
+  --url http://localhost:8082/presale/launchpad/addpad \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "token_owner": "0xOwnerWallet...",
+    "presale_addr": "0xPresaleContract...",
+    "token_name": "Example Token",
+    "token_symbol": "EXT",
+    "token_addr": "0xTokenContract...",
+    "token_decimal": 18,
+    "token_supply": 1000000,
+    "token_presale_rate": 1000,
+    "token_listing_rate": 800,
+    "softcap": 50,
+    "hardcap": 100,
+    "starttime": "2024-02-01T00:00:00.000Z",
+    "endtime": "2024-02-15T00:00:00.000Z",
+    "minBuy": 0.1,
+    "maxBuy": 5,
+    "liquidityPercent": 60,
+    "lockupTime": 365,
+    "iswhitelist": false,
+    "unsold": true,
+    "presaletype": true,
+    "network": 56,
+    "useVestingCont": false,
+    "useTeamVest": false,
+    "logoURL": "https://example.com/logo.png",
+    "websiteURL": "https://example.com",
+    "description": "A demo token presale."
+  }'
+```
+
+```json Response
+{
+  "_id": "64a1f2c3e4b0a1b2c3d4e5f6",
+  "token_owner": "0xOwnerWallet...",
+  "token_name": "Example Token",
+  "token_symbol": "EXT",
+  "verified": false,
+  "network": 56
+}
+```
+
+</CodeGroup>
+
+---
+
+## PUT /presale/launchpad/:id
+
+Update an existing presale document. Accepts a partial or full request body matching the presale schema fields.
+
+### Path parameters
+
+<ParamField path="id" type="string" required>
+  The MongoDB `_id` of the presale to update.
+</ParamField>
+
+### Request body
+
+Any subset of the presale fields listed under `POST /addpad`. Only the provided fields are updated.
+
+### Example
+
+<CodeGroup>
+
+```bash cURL
+curl --request PUT \
+  --url http://localhost:8082/presale/launchpad/64a1f2c3e4b0a1b2c3d4e5f6 \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "verified": true,
+    "hardcap": 200
+  }'
+```
+
+```json Response
+{
+  "status": "success",
+  "data": {
+    "_id": "64a1f2c3e4b0a1b2c3d4e5f6",
+    "token_name": "Example Token",
+    "hardcap": 100,
+    "verified": false
+  }
+}
+```
+
+</CodeGroup>
+
+<Note>
+  The `data` field in the response contains the document state **before** the update was applied (Mongoose `findByIdAndUpdate` default behavior).
+</Note>
+
+---
+
+## DELETE /presale/launchpad/:id
+
+Delete a presale document, scoped to a specific chain.
+
+### Path parameters
+
+<ParamField path="id" type="string" required>
+  The MongoDB `_id` of the presale to delete.
+</ParamField>
+
+### Query parameters
+
+<ParamField query="chainId" type="number" required>
+  The numeric chain/network ID. The delete operation only matches if both `_id` and `network` align.
+</ParamField>
+
+### Example
+
+<CodeGroup>
+
+```bash cURL
+curl --request DELETE \
+  --url 'http://localhost:8082/presale/launchpad/64a1f2c3e4b0a1b2c3d4e5f6?chainId=56'
+```
+
+```json Response
+{
+  "acknowledged": true,
+  "deletedCount": 1
+}
+```
+
+</CodeGroup>

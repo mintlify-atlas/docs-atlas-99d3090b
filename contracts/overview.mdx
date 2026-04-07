@@ -1,0 +1,67 @@
+---
+title: "Smart contracts overview"
+description: "An overview of the ELO Token and Presale smart contracts deployed on BSC"
+---
+
+The ELO Token Demo project is built on two Solidity smart contracts: **ELOToken**, an ERC20 token contract, and **ELOPresale**, a presale contract that accepts BNB and distributes tokens to participants. Both contracts are deployed on BSC Testnet.
+
+## Contracts
+
+| Contract   | Solidity version | Role                                     |
+| ---------- | ---------------- | ---------------------------------------- |
+| ELOToken   | `^0.8.9`         | ERC20 token; mints and distributes supply at construction |
+| ELOPresale | `^0.6.12`        | Accepts BNB deposits; distributes tokens on success or refunds on failure |
+
+## Architecture
+
+```
+Deployer
+  │
+  ├─── deploy ──► ELOToken
+  │                  │
+  │             mints 1,000,000,000 ELO
+  │             transfers 10% (100,000,000 ELO) to presaleAddress
+  │
+  └─── deploy ──► ELOPresale
+                     │
+                     ├─ init_private() ◄── owner configures presale parameters
+                     │
+                     ├─ userDeposit()  ◄── buyers send BNB during presale window
+                     │
+                     ├─ [SUCCESS] userWithdrawTokens() ◄── buyers claim ELO
+                     │           purchaseICOCoin()     ◄── owner withdraws BNB
+                     │
+                     └─ [FAILURE] userWithdrawBaseTokens() ◄── buyers reclaim BNB
+```
+
+ELOToken is deployed first. A portion of the total supply is transferred to the presale contract address. The presale contract is then initialized via `init_private` with the token address and sale parameters before the presale window opens.
+
+## Deployed addresses (BSC Testnet)
+
+| Role    | Address                                        |
+| ------- | ---------------------------------------------- |
+| Owner   | `0x5C29099Dc53ddf3b3Fa3a299C48EC1Bff9C59d29` |
+| Token   | `0x6154818f854f5009C5CFa47213C68598E9dE02FA` |
+| Presale | `0xDD1C2603315A0C1ad649819A70451D5529F53398` |
+
+## Technology
+
+- **Solidity** `^0.8.9` — ELOToken contract
+- **Solidity** `^0.6.12` — ELOPresale contract
+- **Truffle** — compilation, migration, and deployment tooling
+- **Ganache** — local development chain (`ganache-cli`)
+- **BSC Testnet** — public testnet deployment target
+
+## Contract pages
+
+<CardGroup cols={3}>
+  <Card title="ELO token contract" icon="coin" href="/contracts/elo-token">
+    ERC20 token details, distribution, and function reference.
+  </Card>
+  <Card title="Presale contract" icon="cart-shopping" href="/contracts/presale-contract">
+    Presale mechanics, structs, and function reference.
+  </Card>
+  <Card title="Deploying contracts" icon="rocket" href="/contracts/deployment">
+    Deploy to a local dev chain or BSC Testnet using Truffle.
+  </Card>
+</CardGroup>

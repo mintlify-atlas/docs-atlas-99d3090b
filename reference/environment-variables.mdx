@@ -1,0 +1,64 @@
+---
+title: "Environment variables"
+description: "All environment variables for configuring ELO Token Demo"
+---
+
+The backend reads configuration from a `config.env` file in the project root. This file is not committed to source control and must be created manually on each environment.
+
+<Warning>
+  Never commit `config.env` to source control. It contains your database credentials and JWT secret. Add it to `.gitignore` before running `git add`.
+</Warning>
+
+## Backend (`config.env`)
+
+<ParamField path="ATLAS_URI" type="string" required>
+  MongoDB connection string. Used by Mongoose to connect to your MongoDB Atlas cluster or any compatible MongoDB instance.
+
+  ```
+  ATLAS_URI=mongodb+srv://<user>:<password>@<cluster>.mongodb.net/<dbname>?retryWrites=true&w=majority
+  ```
+</ParamField>
+
+<ParamField path="PORT" type="number" default="8082">
+  Port the Express backend listens on. Defaults to `8082` when running with `npm start`. Set this if port 8082 is unavailable on your host.
+</ParamField>
+
+<ParamField path="TOKEN_KEY" type="string" required>
+  Secret key used to sign and verify JWT tokens. Must be a long, random string. Do not reuse across environments.
+</ParamField>
+
+## Frontend (`.env`)
+
+Frontend environment variables are read by Create React App at build time. Copy `.env.example` to `.env` and fill in your values.
+
+<ParamField path="REACT_APP_WALLETCONNECT_PROJECT_ID" type="string">
+  WalletConnect v2 project ID. Required to enable the WalletConnect option in the Connect Wallet dialog. Obtain a project ID at [https://cloud.walletconnect.com](https://cloud.walletconnect.com).
+</ParamField>
+
+<ParamField path="REACT_APP_MORALIS_APPLICATION_ID" type="string">
+  Moralis application ID. Required for swap and NFT functionality. Create a server at [https://moralis.io](https://moralis.io) to obtain this value. If unset, the app falls back to a legacy demo URL that may not resolve.
+</ParamField>
+
+<ParamField path="REACT_APP_MORALIS_SERVER_URL" type="string">
+  Moralis server URL. Must be set alongside `REACT_APP_MORALIS_APPLICATION_ID`.
+
+  Example format: `https://xxxxx.your-server.com:2053/server`
+</ParamField>
+
+## Example `config.env`
+
+```bash config.env
+ATLAS_URI=mongodb+srv://myuser:mypassword@cluster0.example.mongodb.net/presale?retryWrites=true&w=majority
+PORT=8082
+TOKEN_KEY=a1b2c3d4e5f6...
+```
+
+<Tip>
+  Generate a secure `TOKEN_KEY` with Node.js:
+
+  ```bash
+  node -e "require('crypto').randomBytes(32).toString('hex')"
+  ```
+
+  Copy the output directly into `config.env`.
+</Tip>

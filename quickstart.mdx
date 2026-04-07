@@ -1,80 +1,130 @@
 ---
 title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+description: "Get ELO Token Demo running locally and connect your Web3 wallet"
 ---
 
-## Get started in three steps
+## Prerequisites
 
-Get your documentation site running locally and make your first customization.
+Before you begin, make sure you have the following installed and ready:
 
-### Step 1: Set up your local environment
+- **Node.js v16 or later** — required for both the Express backend and the React frontend
+- **MetaMask or a compatible Web3 wallet** — used to connect to the app and sign transactions
+- **MongoDB** — the backend uses MongoDB (via Mongoose) to store presale data; a [MongoDB Atlas](https://www.mongodb.com/atlas) free tier cluster works fine
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
+## Installation
 
-### Step 2: Deploy your changes
+<Steps>
+  <Step title="Clone the repository">
+    Clone the ELO Token Demo repository to your local machine:
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+    ```bash
+    git clone https://github.com/mega4010/TokenDemo.git
+    cd TokenDemo
+    ```
+  </Step>
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+  <Step title="Install dependencies">
+    Install all frontend and backend packages from the project root. Both the React app and Express server share the same `package.json`.
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+    <CodeGroup>
 
-### Step 3: Go live
+    ```bash npm
+    npm install
+    ```
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+    ```bash yarn
+    yarn install
+    ```
 
-## Next steps
+    </CodeGroup>
+  </Step>
 
-Now that you have your docs running, explore these key features:
+  <Step title="Configure environment variables">
+    Create a `config.env` file in the project root with your MongoDB connection string and JWT secret. See [Environment setup](/environment-setup) for full details.
 
-<CardGroup cols={2}>
+    ```bash config.env
+    ATLAS_URI=mongodb+srv://<user>:<password>@<cluster>.mongodb.net/presale?retryWrites=true&w=majority
+    PORT=8082
+    TOKEN_KEY=your-secret-key
+    ```
+  </Step>
 
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
+  <Step title="Start the app">
+    Run the following command to start both the backend and frontend together:
 
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
+    ```bash
+    npm start
+    ```
 
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
+    <Note>
+      `npm start` runs both the Express server and the React dev server concurrently using a single command: `npm run server | react-scripts --openssl-legacy-provider start`. You do not need to start them separately.
+    </Note>
+  </Step>
+</Steps>
 
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
+## Running locally
 
-</CardGroup>
+Once started, two servers are available:
+
+| Server | URL |
+|---|---|
+| React frontend | `http://localhost:3000` |
+| Express backend | `http://localhost:8082` |
+
+Open `http://localhost:3000` in your browser to access the application.
+
+### Available npm scripts
+
+| Command | Description |
+|---|---|
+| `npm start` | Start Express backend and React dev server together |
+| `npm run server` | Run Express backend only |
+| `npm run build` | Build React app for production |
+| `npm run deploy` | Deploy contracts via Truffle |
+| `npm run devchain` | Start a local Truffle development chain |
+
+## Connecting your wallet
+
+On your first visit to `http://localhost:3000`, the app prompts you to connect a wallet before accessing any DeFi features.
+
+<Steps>
+  <Step title="Open the app">
+    Navigate to `http://localhost:3000`. You will land on the home page.
+  </Step>
+
+  <Step title="Click Connect Wallet">
+    Click the **Connect Wallet** button in the navigation bar. A wallet selection dialog appears.
+  </Step>
+
+  <Step title="Select your wallet">
+    Choose **MetaMask**, **Rabby**, or any other injected Web3 wallet. The app uses `@web3-react/injected-connector` to detect browser-injected wallets automatically.
+  </Step>
+
+  <Step title="Approve the connection">
+    Confirm the connection request in your wallet extension. Once connected, your wallet address appears in the navigation bar.
+  </Step>
+
+  <Step title="Switch to BSC Testnet">
+    ELO Token Demo is deployed on **BSC Testnet** (chain ID 97). Switch your wallet network to BSC Testnet to interact with the presale and token contracts. Your wallet may prompt you to add the network if it is not already configured.
+  </Step>
+</Steps>
+
+## Quick tour of the app
+
+The React app is a single-page application with the following routes:
+
+| Route | Description |
+|---|---|
+| `/` | Landing page |
+| `/home` | Main dashboard after connecting |
+| `/pre-sale` | ELO token presale launchpad |
+| `/swap` | Token swap interface |
+| `/mint` | NFT minting |
+| `/nfts` | NFT gallery |
+| `/stake` | Staking UI |
+| `/transactions` | Transaction history |
+| `/onramp` | Fiat-to-crypto on-ramp (Ramper integration) |
 
 <Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
+  Staking (`/stake`) is a UI placeholder — the staking smart contract is planned but not yet deployed.
 </Note>

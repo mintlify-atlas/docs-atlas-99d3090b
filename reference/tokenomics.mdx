@@ -1,0 +1,39 @@
+---
+title: "Tokenomics"
+description: "ELO token supply, distribution, and allocation breakdown"
+---
+
+## Token details
+
+| Property     | Value                          |
+| ------------ | ------------------------------ |
+| Name         | Effortless Order               |
+| Symbol       | ELO                            |
+| Total supply | 1,000,000,000 (1 billion)      |
+| Decimals     | 18                             |
+| Standard     | ERC-20 (deployed on BSC)       |
+| Contract     | `elotoken.sol` (Solidity ^0.8.9) |
+
+## Distribution
+
+The entire supply is minted once at contract deployment and allocated to separate addresses according to the following breakdown.
+
+| Allocation        | Percentage | Amount (ELO)    |
+| ----------------- | ---------- | --------------- |
+| Staking           | 25%        | 250,000,000     |
+| Order rewards     | 20%        | 200,000,000     |
+| CEX reserved      | 15%        | 150,000,000     |
+| Presale           | 10%        | 100,000,000     |
+| DEX               | 10%        | 100,000,000     |
+| Team              | 10%        | 100,000,000     |
+| Customer rewards  | 5%         | 50,000,000      |
+| Airdrop           | 5%         | 50,000,000      |
+| **Total**         | **100%**   | **1,000,000,000** |
+
+## Minting policy
+
+<Note>
+  Minting is permanent and one-time only. The constructor sets `mintingFinishedPermanent = true` immediately after minting the full supply at deployment. No additional tokens can ever be created.
+</Note>
+
+This means the total supply is fixed at 1,000,000,000 ELO from the moment the contract is deployed. There is no owner function, admin key, or governance mechanism that can increase the supply after that point.

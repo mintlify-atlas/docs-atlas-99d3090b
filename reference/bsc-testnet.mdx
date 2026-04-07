@@ -1,0 +1,63 @@
+---
+title: "BSC Testnet setup"
+description: "Configure MetaMask for Binance Smart Chain Testnet"
+---
+
+BSC Testnet is the test network for Binance Smart Chain. It mirrors the mainnet environment but uses test tokens with no real monetary value. Use it to interact with the ELO Token Demo contracts without spending real funds.
+
+<Note>
+  The BSC mainnet chain ID is 56. The ELO Token Demo contracts are deployed on **BSC Testnet (chain ID 97)** only. Do not attempt to use mainnet with this demo.
+</Note>
+
+## MetaMask network configuration
+
+Use the following settings to add BSC Testnet to MetaMask manually.
+
+| Field            | Value                                                  |
+| ---------------- | ------------------------------------------------------ |
+| Network name     | BSC Testnet                                            |
+| RPC URL          | `https://data-seed-prebsc-1-s1.binance.org:8545/`      |
+| Chain ID         | 97                                                     |
+| Currency symbol  | tBNB                                                   |
+| Block explorer   | `https://testnet.bscscan.com`                          |
+
+## Add BSC Testnet to MetaMask
+
+<Steps>
+  <Step title="Open MetaMask">
+    Click the MetaMask extension icon in your browser to open the wallet.
+  </Step>
+  <Step title="Open the network selector">
+    Click the network name in the top-left of the MetaMask popup (e.g., "Ethereum Mainnet") to open the network dropdown.
+  </Step>
+  <Step title="Add a network">
+    Click **Add network**, then select **Add a network manually** at the bottom of the page.
+  </Step>
+  <Step title="Enter network details">
+    Fill in the fields using the values from the table above:
+
+    - **Network name:** BSC Testnet
+    - **New RPC URL:** `https://data-seed-prebsc-1-s1.binance.org:8545/`
+    - **Chain ID:** 97
+    - **Currency symbol:** tBNB
+    - **Block explorer URL:** `https://testnet.bscscan.com`
+  </Step>
+  <Step title="Save and switch">
+    Click **Save**. MetaMask will switch to BSC Testnet automatically. You should see **tBNB** as the currency in your wallet.
+  </Step>
+</Steps>
+
+## Get test BNB
+
+Your testnet wallet starts with a zero balance. Use the official faucet to receive free tBNB for paying gas fees.
+
+<Tip>
+  Visit the BSC Testnet faucet: [https://testnet.binance.org/faucet-smart](https://testnet.binance.org/faucet-smart)
+
+  Paste your wallet address and request tBNB. Funds typically arrive within a few seconds.
+</Tip>
+
+You need tBNB to:
+
+- Pay gas fees when interacting with the presale contract
+- Purchase ELO tokens during the presale (minimum 0.1 tBNB)

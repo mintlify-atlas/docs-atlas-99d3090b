@@ -1,0 +1,76 @@
+---
+title: "Token swap"
+description: "Swap tokens using the ELO Token Demo swap interface"
+---
+
+The swap interface lets you exchange tokens across Ethereum and BSC networks. It is powered by the **1inch DEX aggregator** and uses Moralis to resolve the connected chain and fetch token lists and price quotes in real time.
+
+## Prerequisites
+
+- A connected Web3 wallet (see [Wallet integration](/features/wallet))
+- Your wallet set to Ethereum mainnet (`0x1`) or BSC mainnet (`0x38`)
+- Sufficient token balance and ETH/BNB for gas
+
+<Note>
+  The swap interface reads the connected chain ID from `useMoralisDapp()` and routes to either the `eth` or `bsc` 1inch endpoint accordingly. Only Ethereum mainnet and BSC mainnet are supported for swaps.
+</Note>
+
+## How to swap
+
+<Steps>
+  <Step title="Connect your wallet">
+    Click **Connect Wallet** and approve the connection. The swap card shows a "Connect wallet" chip on the token selectors until a wallet is active.
+  </Step>
+
+  <Step title="Navigate to /swap">
+    Go to `/swap`. The swap card loads automatically once your wallet is connected and the token list has been fetched from 1inch.
+  </Step>
+
+  <Step title="Select a token to swap from">
+    The **From** field defaults to the native token of the connected chain (ETH or BNB). Click the token chip to open the token selector dialog. Search by name and select any token from the 1inch token list.
+  </Step>
+
+  <Step title="Select a token to swap to">
+    Click the token chip in the **To** field and select the destination token from the same list. The **To** amount field is read-only — it is filled automatically from the quote.
+  </Step>
+
+  <Step title="Enter an amount">
+    Type the amount you want to swap in the **From** field. As you type, the app calls `getQuote()` via `useInchDex` and populates the **To** field with the estimated output amount, along with:
+
+    - **Estimated gas** — the gas estimate from 1inch
+    - **Price** — the exchange rate between the two tokens, with a USD price reference
+  </Step>
+
+  <Step title="Click Swap">
+    Click the **Swap** button to execute the trade. The app calls `trySwap(currentTrade)` which submits the transaction through the 1inch API. Confirm the transaction in your wallet.
+
+    The Swap button is disabled and shows an explanatory label when:
+
+    | Label | Reason |
+    |-------|--------|
+    | Switch to eth / Switch to bsc | Connected chain does not match the swap chain |
+    | Enter an amount | No amount has been typed yet |
+    | Select tokens | Both tokens have not been chosen |
+  </Step>
+</Steps>
+
+## Supported chains
+
+| Chain | Chain ID | 1inch endpoint |
+|-------|----------|----------------|
+| Ethereum mainnet | `0x1` | `eth` |
+| BSC mainnet | `0x38` | `bsc` |
+
+## Technical details
+
+The swap feature uses the following libraries and hooks:
+
+- **`useInchDex`** — custom hook that wraps the 1inch DEX API; handles token list fetching, quote requests, and swap execution
+- **`useTokenPrice`** — fetches USD token prices via Moralis for display in the quote summary
+- **`useMoralisDapp`** — provides the connected `chainId` and `walletAddress` from the Moralis DApp context
+- **ethers.js** — used for value formatting and contract interactions
+- **Moralis** — provides the Web3 context and token price data
+
+<Tip>
+  Token prices are fetched per-token as you select them. If a price fails to load (for example, for low-liquidity tokens), the quote still shows the token amount but omits the USD reference price.
+</Tip>

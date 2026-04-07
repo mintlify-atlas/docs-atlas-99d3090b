@@ -1,0 +1,74 @@
+---
+title: "ELO Token Demo"
+description: "A full-stack Web3 DApp for the ELO (Effortless Order) token — featuring a token presale launchpad, NFT minting, token swaps, staking, and wallet integration on BSC."
+---
+
+ELO Token Demo is an open-source Web3 application built around the **ELO (Effortless Order)** token on the Binance Smart Chain. It provides a complete set of DeFi features — from buying tokens in a presale to minting NFTs and swapping tokens — all accessible through a React-based frontend with MetaMask and injected wallet support.
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Run the app locally and connect your wallet in minutes
+  </Card>
+  <Card title="Token Presale" icon="coins" href="/features/presale">
+    Participate in the ELO token presale launchpad
+  </Card>
+  <Card title="Smart Contracts" icon="file-contract" href="/contracts/overview">
+    Explore the ELO token and presale Solidity contracts
+  </Card>
+  <Card title="Backend API" icon="server" href="/api/authentication">
+    Authenticate and manage presale campaigns via REST API
+  </Card>
+</CardGroup>
+
+## What you can do
+
+<CardGroup cols={3}>
+  <Card title="Buy ELO tokens" icon="money-bill-wave" href="/features/presale">
+    Participate in the presale and claim tokens after it succeeds
+  </Card>
+  <Card title="Connect your wallet" icon="wallet" href="/features/wallet">
+    Use MetaMask, Rabby, or any injected Web3 wallet
+  </Card>
+  <Card title="Swap tokens" icon="arrow-right-arrow-left" href="/features/token-swap">
+    Exchange tokens through the built-in swap interface
+  </Card>
+  <Card title="Mint NFTs" icon="image" href="/features/nft-minting">
+    Mint and view NFTs directly from the gallery
+  </Card>
+  <Card title="Stake ELO" icon="layer-group" href="/features/staking">
+    Stake tokens to earn rewards (UI available)
+  </Card>
+  <Card title="On-Ramp fiat" icon="credit-card" href="/features/onramp">
+    Convert fiat to crypto using the Ramper integration
+  </Card>
+</CardGroup>
+
+## Tech stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | React 17, Material-UI, Ant Design |
+| Web3 | ethers.js, web3-react, Moralis |
+| Backend | Node.js, Express |
+| Database | MongoDB (Mongoose) |
+| Blockchain | Solidity ^0.8.9, Truffle |
+| Auth | JWT, bcrypt |
+
+## Network
+
+ELO Token Demo is deployed on **BSC Testnet**. See [deployed contract addresses](/reference/deployed-addresses) for the on-chain details.
+
+<Steps>
+  <Step title="Set up environment">
+    Clone the repo and configure your `config.env` file with MongoDB and JWT settings
+  </Step>
+  <Step title="Install dependencies">
+    Run `npm install` to install all frontend and backend packages
+  </Step>
+  <Step title="Start the app">
+    Run `npm start` to launch both the Express backend and React dev server
+  </Step>
+  <Step title="Connect your wallet">
+    Open `http://localhost:3000`, click **Connect Wallet**, and select MetaMask or another injected wallet
+  </Step>
+</Steps>

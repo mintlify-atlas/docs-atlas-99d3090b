@@ -1,0 +1,102 @@
+---
+title: "Token presale"
+description: "Participate in the ELO token presale using the launchpad interface"
+---
+
+The ELO token presale lets you buy $ELO at a fixed rate before the token is publicly listed. You send BNB (or ETH on Ropsten testnet) to the presale contract, and the contract calculates your token allocation. All purchased tokens can be claimed after the vesting period ends if the presale succeeds.
+
+10% of the total 1,000,000,000 ELO supply — **100,000,000 ELO** — is allocated to the presale.
+
+## Prerequisites
+
+- A connected Web3 wallet (see [Wallet integration](/features/wallet))
+- BNB (BSC Testnet, chain ID 97) or ETH (Ropsten testnet, chain ID 3) to cover the purchase and gas fees
+- Your wallet set to BSC Testnet (chain ID 97) or Ropsten (chain ID 3)
+
+<Note>
+  Ropsten is a deprecated Ethereum testnet. The presale contract supports both BSC Testnet and Ropsten, but BSC Testnet is the recommended network for testing. The BSC Testnet presale contract address is `0xDD1C2603315A0C1ad649819A70451D5529F53398`.
+</Note>
+
+## How to participate
+
+<Steps>
+  <Step title="Connect your wallet">
+    Click **Connect Wallet** in the navigation bar and approve the connection in your wallet extension. Your wallet must be on BSC Testnet or Ropsten for the presale contract to respond.
+  </Step>
+
+  <Step title="Navigate to the presale">
+    Go to `/pre-sale`. The page displays a live countdown until the presale opens. Once the presale is active, the launchpad card loads automatically with token information, presale parameters, and your buyer details.
+  </Step>
+
+  <Step title="Review presale information">
+    The launchpad card shows the current presale parameters pulled directly from the contract:
+
+    - **Token rate** — how many BNB (or ETH) one ELO costs
+    - **Softcap** and **Hardcap** — the minimum and maximum raise targets
+    - **Buy min / Buy max** — the per-transaction contribution limits
+    - **Raised amount** and **Sold amount** — live progress from the contract
+    - **Your invested amount** and **ELO allocation**
+  </Step>
+
+  <Step title="Enter an amount and buy">
+    When the presale state is **Soft Presale Active** or **Public Presale Active**, an input field appears under "Buy ELO Token". Enter the amount of BNB (or ETH) you want to spend within the `raise_min`–`raise_max` range, then click **Buy**. Confirm the transaction in your wallet.
+  </Step>
+
+  <Step title="Claim or withdraw after the presale ends">
+    Once the presale concludes:
+
+    - If the presale **succeeded** (status 2), click **Claim** to receive your ELO tokens. Tokens are transferred to your wallet via `userWithdrawTokens()`.
+    - If the presale **failed** (status 3), click **Withdraw** to get a full BNB/ETH refund via `userWithdrawBaseTokens()`.
+  </Step>
+</Steps>
+
+## Presale status states
+
+The contract's `presaleStatus()` function returns one of four integer values that drive the UI state:
+
+| Value | Label | Description |
+|-------|-------|-------------|
+| `0` | QUEUED | Presale has not started yet — awaiting the `presale_start` block timestamp |
+| `1` | ACTIVE | Presale is open — deposits are accepted between `presale_start` and `presale_end` |
+| `2` | SUCCESS | Presale ended and the softcap was reached (or hardcap was hit mid-presale) — token claims are enabled |
+| `3` | FAILED | Presale ended without reaching the softcap — BNB/ETH refunds are available |
+
+The UI chip on the launchpad card reflects these states, and the action button switches between **Buy**, **Claim**, and **Withdraw** accordingly.
+
+## Presale mechanics
+
+The presale contract (`ELOPresale`) enforces the following parameters set at initialization via `init_private()`:
+
+| Parameter | Description |
+|-----------|-------------|
+| `token_rate` | Number of ELO tokens issued per 1 BNB/ETH sent |
+| `raise_min` | Minimum BNB/ETH per deposit transaction |
+| `raise_max` | Maximum cumulative BNB/ETH a single buyer can contribute |
+| `softcap` | Minimum total raise required for the presale to succeed |
+| `hardcap` | Maximum total raise; no further deposits accepted once hit |
+| `presale_start` | Unix timestamp when deposits open |
+| `presale_end` | Unix timestamp when deposits close |
+
+The contract also has two presale phases visible in the frontend:
+
+- **Soft Presale Active** — early access phase before the full public window opens
+- **Public Presale Active** — open to all participants
+
+Both phases use the same `userDeposit()` function and apply the same `raise_min`/`raise_max` constraints.
+
+## Tokenomics context
+
+| Allocation | Percentage | Amount (ELO) |
+|------------|-----------|--------------|
+| Presale | 10% | 100,000,000 |
+| DEX liquidity | 10% | 100,000,000 |
+| CEX Reserved | 15% | 150,000,000 |
+| Staking rewards | 25% | 250,000,000 |
+| Team | 10% | 100,000,000 |
+| Order rewards | 20% | 200,000,000 |
+| Customer rewards | 5% | 50,000,000 |
+| Airdrop | 5% | 50,000,000 |
+
+<Note>
+  The deployed presale contract address on BSC Testnet is `0xDD1C2603315A0C1ad649819A70451D5529F53398`. The ELO token contract is at `0x6154818f854f5009C5CFa47213C68598E9dE02FA`.
+</Note>

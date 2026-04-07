@@ -1,0 +1,82 @@
+{
+  "projectType": "saas",
+  "projectName": "ELO Token Demo",
+  "projectDescription": "A full-stack Web3 DApp for the ELO (Effortless Order) token, featuring a token presale launchpad, NFT minting, token swaps, staking, and wallet integration on BSC.",
+  "theme": "luma",
+  "primaryColor": "#5B4FE8",
+  "lightColor": "#7B72F0",
+  "darkColor": "#3D33C8",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": ["introduction", "quickstart", "environment-setup"]
+          },
+          {
+            "group": "Core Features",
+            "pages": ["features/presale", "features/wallet", "features/nft-minting", "features/token-swap", "features/staking", "features/onramp"]
+          },
+          {
+            "group": "Smart Contracts",
+            "pages": ["contracts/overview", "contracts/elo-token", "contracts/presale-contract", "contracts/deployment"]
+          },
+          {
+            "group": "Backend API",
+            "pages": ["api/authentication", "api/launchpad"]
+          }
+        ]
+      },
+      {
+        "tab": "Reference",
+        "groups": [
+          {
+            "group": "Configuration",
+            "pages": ["reference/environment-variables", "reference/tokenomics"]
+          },
+          {
+            "group": "Deployed Contracts",
+            "pages": ["reference/deployed-addresses", "reference/bsc-testnet"]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "ELO token presale launchpad with softcap/hardcap mechanics",
+    "MetaMask and injected wallet integration via web3-react",
+    "ERC20 token (ELO) smart contract on BSC",
+    "NFT minting and gallery UI",
+    "Token swap interface",
+    "JWT-based user authentication",
+    "Fiat-to-crypto on-ramp via Ramper",
+    "Transaction history tracking",
+    "Truffle-based contract deployment pipeline"
+  ],
+  "publicApiSurface": [
+    "POST /presale/auth/register",
+    "POST /presale/auth/login",
+    "POST /presale/auth/update",
+    "GET /presale/launchpad/all",
+    "GET /presale/launchpad/allboth",
+    "GET /presale/launchpad/pendings",
+    "GET /presale/launchpad/pendingall",
+    "GET /presale/launchpad/page",
+    "GET /presale/launchpad/myzone",
+    "GET /presale/launchpad/:id",
+    "POST /presale/launchpad/addpad",
+    "PUT /presale/launchpad/:id",
+    "DELETE /presale/launchpad/:id",
+    "ELOToken.transfer(address, uint256)",
+    "ELOToken.approve(address, uint256)",
+    "ELOToken.transferFrom(address, address, uint256)",
+    "ELOToken.balanceOf(address)",
+    "ELOPresale.userDeposit()",
+    "ELOPresale.userWithdrawTokens()",
+    "ELOPresale.userWithdrawBaseTokens()",
+    "ELOPresale.presaleStatus()",
+    "ELOPresale.init_private(...)"
+  ]
+}

@@ -1,0 +1,83 @@
+---
+title: "Environment setup"
+description: "Configure environment variables for the ELO Token Demo backend"
+---
+
+## Overview
+
+The ELO Token Demo backend reads its configuration from a file named **`config.env`** in the project root. This file is loaded at startup by both `server.js` and `config/db.js` using `dotenv`:
+
+```javascript
+require("dotenv").config({ path: "./config.env" });
+```
+
+`config.env` is **not** a standard `.env` file — make sure you use the exact filename `config.env` or the app will not pick up your settings.
+
+<Warning>
+  Never commit `config.env` to source control. It contains your MongoDB credentials and JWT secret. Add `config.env` to your `.gitignore` before your first commit.
+</Warning>
+
+## Required variables
+
+<ParamField path="ATLAS_URI" type="string" required>
+  MongoDB connection string. The backend uses Mongoose to connect to a MongoDB database at the URI provided here. For MongoDB Atlas, this is the SRV connection string from your cluster dashboard.
+
+  ```
+  ATLAS_URI=mongodb+srv://<user>:<password>@<cluster>.mongodb.net/presale?retryWrites=true&w=majority
+  ```
+</ParamField>
+
+<ParamField path="PORT" type="number" default="8082">
+  The port the Express server listens on. The server hardcodes port `8082` in `server.js`, so set this to `8082` unless you modify the source. The React dev server always runs on port `3000` independently of this value.
+</ParamField>
+
+<ParamField path="TOKEN_KEY" type="string" required>
+  Secret key used to sign and verify JSON Web Tokens (JWT) for backend authentication. Use a long, random string. Never reuse a key across environments.
+</ParamField>
+
+## Example config.env
+
+```bash config.env
+ATLAS_URI=mongodb+srv://<user>:<password>@<cluster>.mongodb.net/presale?retryWrites=true&w=majority
+PORT=8082
+TOKEN_KEY=your-random-secret-here
+```
+
+## MongoDB Atlas setup
+
+If you do not have a MongoDB instance, create a free cluster on MongoDB Atlas:
+
+1. Go to [https://www.mongodb.com/atlas](https://www.mongodb.com/atlas) and sign up or log in.
+2. Create a new **free tier (M0)** cluster.
+3. Under **Database Access**, create a database user with a username and password.
+4. Under **Network Access**, add your IP address (or `0.0.0.0/0` for development).
+5. In the cluster view, click **Connect** → **Connect your application** → copy the **SRV connection string**.
+6. Replace `<password>` in the string with your database user's password and paste it as the value of `ATLAS_URI` in `config.env`.
+
+The database name in the connection string should be `presale` to match the default routes.
+
+## Generating a secure TOKEN_KEY
+
+<Tip>
+  Use Node.js's built-in `crypto` module to generate a cryptographically secure random key:
+
+  ```bash
+  node -e "require('crypto').randomBytes(32).toString('hex')"
+  ```
+
+  Copy the output and use it as your `TOKEN_KEY` value. Each environment (development, staging, production) should have a different key.
+</Tip>
+
+## Frontend environment variables
+
+The React frontend accepts optional variables via a `.env` file (standard Create React App convention, separate from `config.env`). These are not required to run the app but enable additional features:
+
+| Variable | Description |
+|---|---|
+| `REACT_APP_WALLETCONNECT_PROJECT_ID` | WalletConnect v2 project ID for the WalletConnect wallet option. Get one at [cloud.walletconnect.com](https://cloud.walletconnect.com). |
+| `REACT_APP_MORALIS_APPLICATION_ID` | Moralis application ID for swap, NFT, and transaction features. |
+| `REACT_APP_MORALIS_SERVER_URL` | Moralis server URL corresponding to the application ID above. |
+
+<Note>
+  If `REACT_APP_MORALIS_APPLICATION_ID` and `REACT_APP_MORALIS_SERVER_URL` are not set, the app falls back to a legacy Moralis demo URL that may no longer resolve, causing network errors in the swap and NFT sections.
+</Note>

@@ -1,0 +1,40 @@
+---
+title: "Deployed contract addresses"
+description: "On-chain addresses for ELO Token and Presale contracts on BSC Testnet"
+---
+
+<Warning>
+  These are testnet addresses on BSC Testnet (Chain ID 97). They are for development and testing only and hold no real value. Do not send mainnet BNB or assets to these addresses.
+</Warning>
+
+## Network
+
+| Property       | Value                                                            |
+| -------------- | ---------------------------------------------------------------- |
+| Network        | BSC Testnet                                                      |
+| Chain ID       | 97                                                               |
+| Block explorer | [testnet.bscscan.com](https://testnet.bscscan.com)               |
+
+## Addresses
+
+| Role     | Address                                      | Explorer link |
+| -------- | -------------------------------------------- | ------------- |
+| Owner    | `0x5C29099Dc53ddf3b3Fa3a299C48EC1Bff9C59d29` | [View on BSCScan](https://testnet.bscscan.com/address/0x5C29099Dc53ddf3b3Fa3a299C48EC1Bff9C59d29) |
+| Token    | `0x6154818f854f5009C5CFa47213C68598E9dE02FA` | [View on BSCScan](https://testnet.bscscan.com/address/0x6154818f854f5009C5CFa47213C68598E9dE02FA) |
+| Presale  | `0xDD1C2603315A0C1ad649819A70451D5529F53398` | [View on BSCScan](https://testnet.bscscan.com/address/0xDD1C2603315A0C1ad649819A70451D5529F53398) |
+
+## Presale parameters
+
+These values are recorded in `contracts/deployed_adr` and were set at presale contract deployment.
+
+| Parameter    | Raw value (wei)          | Converted           |
+| ------------ | ------------------------ | ------------------- |
+| Token rate   | 100000                   | 100,000 ELO per BNB |
+| Raise min    | 100000000000000000       | 0.1 BNB             |
+| Raise max    | 50000000000000000000     | 50 BNB              |
+| Soft cap     | 400000000000000000000    | 400 BNB             |
+| Hard cap     | 1000000000000000000000   | 1,000 BNB           |
+
+<Info>
+  All BNB amounts above refer to testnet BNB (tBNB), which has no monetary value. See [BSC Testnet setup](/reference/bsc-testnet) to configure MetaMask and obtain test BNB from the faucet.
+</Info>

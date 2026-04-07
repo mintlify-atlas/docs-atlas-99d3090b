@@ -1,0 +1,78 @@
+---
+title: "Wallet integration"
+description: "Connect MetaMask, Rabby, or any injected Web3 wallet to ELO Token Demo"
+---
+
+ELO Token Demo uses `@web3-react/injected-connector` to detect and connect any EIP-1193 compliant wallet injected into the browser. MetaMask and Rabby are the most common choices, but any injected provider that exposes `window.ethereum` works.
+
+## Supported wallets
+
+| Wallet | Type | Notes |
+|--------|------|-------|
+| MetaMask | Browser extension | Primary supported wallet |
+| Rabby | Browser extension | Full EIP-1193 support |
+| Any injected wallet | Browser extension | Any wallet exposing `window.ethereum` |
+| WalletConnect | Mobile / QR | Supported via WalletConnect connector |
+
+## How to connect
+
+<Steps>
+  <Step title="Open the app">
+    Navigate to `http://localhost:3000`. The navigation bar shows a **Connect Wallet** button when no wallet is connected.
+  </Step>
+
+  <Step title="Click Connect Wallet">
+    Click **Connect Wallet** in the top navigation bar. A wallet selection dialog appears.
+  </Step>
+
+  <Step title="Select your wallet">
+    Choose **MetaMask**, **Rabby**, or another injected wallet from the list. The app calls `injectedConnector.activate()` from `@web3-react/injected-connector`, which triggers the wallet extension popup.
+  </Step>
+
+  <Step title="Approve the connection">
+    In your wallet extension, review the connection request and click **Connect** (or **Approve**). Once approved, your wallet address and a blockie avatar appear in the navigation bar.
+  </Step>
+
+  <Step title="Switch to the correct network">
+    Presale and staking contracts are deployed on **BSC Testnet** (chain ID 97). If your wallet is on a different network, the app shows an error on the relevant page. Switch to BSC Testnet in your wallet settings.
+
+    <Note>
+      For NFT minting, the contract targets **Rinkeby** (chain ID 4). Make sure you switch to the right network for the feature you are using.
+    </Note>
+  </Step>
+</Steps>
+
+## Network requirements
+
+<Note>
+  BSC Testnet (chain ID 97) is required for the presale and staking features. To add BSC Testnet to MetaMask, use the following RPC settings:
+
+  - **Network name:** BSC Testnet
+  - **RPC URL:** `https://data-seed-prebsc-1-s1.binance.org:8545/`
+  - **Chain ID:** 97
+  - **Currency symbol:** tBNB
+  - **Block explorer:** `https://testnet.bscscan.com`
+</Note>
+
+## Account switching
+
+The app listens for the `accountsChanged` event emitted by the wallet provider. When you switch accounts in MetaMask or Rabby, the app detects the change and reloads on-chain data (balances, presale buyer info, NFT balances) for the newly active account.
+
+## Automatic disconnect when MetaMask is locked
+
+The app runs a polling fallback that periodically checks whether the injected wallet is still accessible. If MetaMask is locked or the extension loses the connection, the app detects the missing provider and disconnects the session automatically. You will need to reconnect and unlock your wallet to resume.
+
+## Disconnect flow
+
+To disconnect manually, click your wallet address or avatar in the navigation bar and select **Disconnect**. This clears the active account from the app's state without requiring any wallet interaction.
+
+## Wallet panel
+
+When connected, the navigation bar displays a wallet panel card that shows:
+
+- Your wallet address (copyable)
+- A blockie avatar generated from your address
+- Your native token balance (BNB or ETH)
+- A transfer interface to send ERC-20 tokens to another address
+
+The transfer interface uses `Moralis.transfer()` with the selected asset, amount, and receiver address.

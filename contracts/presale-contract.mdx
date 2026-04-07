@@ -1,0 +1,205 @@
+---
+title: "Presale contract"
+description: "ELOPresale smart contract mechanics and function reference"
+---
+
+`ELOPresale` manages the token sale lifecycle: collecting BNB deposits, distributing ELO tokens on success, and refunding BNB on failure. The contract is initialized by the owner after deployment via `init_private`.
+
+## Contract details
+
+| Property      | Value                                         |
+| ------------- | --------------------------------------------- |
+| Contract name | `ELOPresale`                                  |
+| Solidity      | `^0.6.12`                                     |
+| Inherits      | `ReentrancyGuard`                             |
+| BSC Testnet   | `0xDD1C2603315A0C1ad649819A70451D5529F53398` |
+
+<Note>
+`userDeposit`, `userWithdrawTokens`, `userWithdrawBaseTokens`, and `purchaseICOCoin` are all protected by the `nonReentrant` modifier from `ReentrancyGuard`, preventing reentrancy attacks on all fund-moving functions.
+</Note>
+
+## Structs
+
+### `PresaleInfo`
+
+Stores the configuration parameters set by the owner via `init_private`.
+
+```solidity
+struct PresaleInfo {
+    address sale_token;    // ELO token contract address
+    uint256 token_rate;    // ELO tokens issued per 1 wei of BNB
+    uint256 raise_min;     // Minimum BNB deposit per buyer (in wei)
+    uint256 raise_max;     // Maximum BNB deposit per buyer (in wei)
+    uint256 softcap;       // Minimum total BNB raise for success (in wei)
+    uint256 hardcap;       // Maximum total BNB to raise (in wei)
+    uint256 presale_start; // Unix timestamp: presale start
+    uint256 presale_end;   // Unix timestamp: presale end
+}
+```
+
+### `PresaleStatus`
+
+Tracks live counters updated as the presale progresses.
+
+```solidity
+struct PresaleStatus {
+    bool    force_failed;   // Owner can set to force a failure state
+    uint256 raised_amount;  // Total BNB raised (wei)
+    uint256 sold_amount;    // Total ELO tokens sold
+    uint256 token_withdraw; // Total ELO claimed by buyers post-success
+    uint256 base_withdraw;  // Total BNB refunded post-failure
+    uint256 num_buyers;     // Number of unique depositing addresses
+}
+```
+
+### `BuyerInfo`
+
+Per-address accounting, stored in the `buyers` mapping.
+
+```solidity
+struct BuyerInfo {
+    uint256 base; // BNB deposited by this buyer (wei); refundable on failure
+    uint256 sale; // ELO tokens allocated to this buyer; claimable on success
+}
+```
+
+### `TokenInfo`
+
+Cached metadata from the ELO token contract, populated by `init_private`.
+
+```solidity
+struct TokenInfo {
+    string  name;
+    string  symbol;
+    uint256 totalsupply;
+    uint256 decimal;
+}
+```
+
+## Presale status
+
+`presaleStatus()` returns a `uint256` representing the current state of the presale.
+
+```solidity
+function presaleStatus() public view returns (uint256);
+```
+
+| Return value | State     | Condition                                                            |
+| ------------ | --------- | -------------------------------------------------------------------- |
+| `0`          | `QUEUED`  | Current time is before `presale_start`                               |
+| `1`          | `ACTIVE`  | Current time is between `presale_start` and `presale_end`            |
+| `2`          | `SUCCESS` | Hardcap reached, or presale ended with `raised_amount >= softcap`    |
+| `3`          | `FAILURE` | Presale ended with `raised_amount < softcap`                         |
+
+## Functions
+
+### `init_private`
+
+Called by the owner after deployment to configure the presale. Also caches token metadata from the ELO contract.
+
+```solidity
+function init_private(
+    address _sale_token,
+    uint256 _token_rate,
+    uint256 _raise_min,
+    uint256 _raise_max,
+    uint256 _softcap,
+    uint256 _hardcap,
+    uint256 _presale_start,
+    uint256 _presale_end
+) public onlyOwner;
+```
+
+| Parameter        | Description                                          |
+| ---------------- | ---------------------------------------------------- |
+| `_sale_token`    | Address of the deployed ELOToken contract            |
+| `_token_rate`    | Number of ELO tokens per wei of BNB (e.g. `100000`) |
+| `_raise_min`     | Minimum BNB deposit in wei (e.g. `0.1 BNB`)         |
+| `_raise_max`     | Maximum BNB deposit per buyer in wei (e.g. `50 BNB`)|
+| `_softcap`       | Minimum total raise for success in wei               |
+| `_hardcap`       | Maximum total raise in wei                           |
+| `_presale_start` | Unix timestamp for presale start                     |
+| `_presale_end`   | Unix timestamp for presale end                       |
+
+### `userDeposit`
+
+Accepts BNB from buyers during the active presale window.
+
+```solidity
+function userDeposit() public payable nonReentrant;
+```
+
+- Requires `presaleStatus() == 1` (ACTIVE).
+- Enforces per-buyer deposit limits (`raise_min` and `raise_max`).
+- Caps the accepted amount to the remaining hardcap allowance.
+- Automatically refunds any BNB sent above the effective allowance.
+- Calculates tokens allocated as `amount_in * token_rate`.
+- Emits `UserDepsitedSuccess(address buyer, uint256 amount)`.
+
+### `userWithdrawTokens`
+
+Called by buyers after a successful presale to claim their ELO tokens.
+
+```solidity
+function userWithdrawTokens() public nonReentrant;
+```
+
+- Requires `presaleStatus() == 2` (SUCCESS).
+- Transfers the buyer's allocated ELO tokens from the presale contract.
+- Resets the buyer's `base` and `sale` balances to zero.
+- Emits `UserWithdrawTokensSuccess(uint256 amount)`.
+
+### `userWithdrawBaseTokens`
+
+Called by buyers after a failed presale to reclaim their BNB.
+
+```solidity
+function userWithdrawBaseTokens() public nonReentrant;
+```
+
+- Requires `presaleStatus() == 3` (FAILURE).
+- Transfers the buyer's deposited BNB back to their address.
+- If the caller is the owner, also triggers `ownerWithdrawTokens` to reclaim unsold ELO.
+- Resets the buyer's `base` and `sale` balances to zero.
+- Emits `UserWithdrawSuccess(uint256 amount)`.
+
+### `purchaseICOCoin`
+
+Owner-only. Withdraws all raised BNB to the owner after a successful presale.
+
+```solidity
+function purchaseICOCoin() public nonReentrant onlyOwner;
+```
+
+- Requires `presaleStatus() == 2` (SUCCESS).
+- Transfers the full contract BNB balance to the owner address.
+
+### `refundTokens`
+
+Owner-only. Reclaims any unsold ELO tokens remaining in the presale contract after the presale has ended successfully.
+
+```solidity
+function refundTokens() public onlyOwner;
+```
+
+- Requires `presaleStatus() == 2` (SUCCESS).
+- Requires `block.timestamp > presale_info.presale_end`.
+- Transfers all remaining ELO in the contract back to the owner.
+
+### `getTimestamp`
+
+Returns the current block timestamp. Useful for verifying presale timing off-chain.
+
+```solidity
+function getTimestamp() public view returns (uint256);
+```
+
+## Events
+
+```solidity
+event UserDepsitedSuccess(address buyer, uint256 amount);
+
+event UserWithdrawSuccess(uint256 amount);
+
+event UserWithdrawTokensSuccess(uint256 amount);
+```

@@ -1,0 +1,138 @@
+---
+title: "Deploying contracts"
+description: "Deploy ELO token and presale contracts to BSC using Truffle"
+---
+
+The project uses Truffle for compiling and migrating contracts. Two npm scripts wrap the Truffle CLI: `npm run devchain` starts a local Ganache chain and `npm run deploy` compiles and migrates contracts against it.
+
+## Prerequisites
+
+- **Node.js** v16 or later
+- **Truffle** installed globally (`npm install -g truffle`) or available via `npx`
+- **Ganache CLI** installed globally (`npm install -g ganache-cli`)
+- A funded deployer wallet (BNB required for BSC Testnet deployments)
+
+## Truffle configuration
+
+The project's Truffle config (`Truffle/truffle-config.js`) defines a single `develop` network targeting a local Ganache instance:
+
+```javascript
+module.exports = {
+  networks: {
+    develop: {
+      host: "127.0.0.1",
+      port: 7545,
+      chainId: 1337,
+      network_id: 1337,
+      deploymentPollingInterval: 10,
+    },
+  },
+};
+```
+
+<Note>
+BSC Testnet is not configured in `truffle-config.js`. To deploy to BSC Testnet you need to add a `bscTestnet` network entry with your RPC URL and wallet private key (via `HDWalletProvider`).
+</Note>
+
+## Migration files
+
+| File                        | What it does                                          |
+| --------------------------- | ----------------------------------------------------- |
+| `1_initial_migration.js`    | Deploys the Truffle `Migrations` tracking contract    |
+| `2_deploy_contracts.js`     | Placeholder migration (deploys `ConvertLib`/`MetaCoin`) |
+
+<Note>
+The current migration files are Truffle boilerplate. You need to add a migration that deploys `ELOToken` and `ELOPresale` before running `npm run deploy` against your own environment.
+</Note>
+
+## Deployment flow
+
+<Steps>
+  <Step title="Install dependencies">
+    From the project root, install all npm packages:
+
+    ```bash
+    npm install
+    ```
+  </Step>
+
+  <Step title="Start the local dev chain">
+    Run the dev chain script to start a Ganache instance on port 7545 with chain ID 1337:
+
+    ```bash
+    npm run devchain
+    ```
+
+    This executes:
+
+    ```bash
+    ganache-cli -d --db data -i 1337 --port 7545
+    ```
+
+    The `-d` flag uses a deterministic seed so account addresses are consistent across restarts. Chain state is persisted to the `data/` directory.
+  </Step>
+
+  <Step title="Deploy contracts">
+    In a separate terminal, run:
+
+    ```bash
+    npm run deploy
+    ```
+
+    This executes:
+
+    ```bash
+    cd Truffle && truffle migrate --reset --compile-all --network develop && node scripts/contractInfo.js
+    ```
+
+    `--reset` redeploys all migrations from scratch. `--compile-all` recompiles every contract. After migration, `contractInfo.js` copies the compiled ABI to `src/contracts/contractInfo.json` for use by the frontend.
+  </Step>
+
+  <Step title="Initialize the presale contract">
+    After both contracts are deployed, call `init_private` on the `ELOPresale` contract from the owner account to configure the presale parameters:
+
+    ```solidity
+    function init_private(
+        address _sale_token,
+        uint256 _token_rate,
+        uint256 _raise_min,
+        uint256 _raise_max,
+        uint256 _softcap,
+        uint256 _hardcap,
+        uint256 _presale_start,
+        uint256 _presale_end
+    ) public onlyOwner;
+    ```
+
+    Example values used on BSC Testnet (from `contracts/deployed_adr`):
+
+    | Parameter        | Value                   | Human-readable    |
+    | ---------------- | ----------------------- | ----------------- |
+    | `_sale_token`    | ELOToken contract address | —               |
+    | `_token_rate`    | `100000`                | 100,000 ELO per BNB |
+    | `_raise_min`     | `100000000000000000`    | 0.1 BNB           |
+    | `_raise_max`     | `50000000000000000000`  | 50 BNB            |
+    | `_softcap`       | `400000000000000000000` | 400 BNB           |
+    | `_hardcap`       | `1000000000000000000000`| 1,000 BNB         |
+    | `_presale_start` | Unix timestamp          | —                 |
+    | `_presale_end`   | Unix timestamp          | —                 |
+  </Step>
+
+  <Step title="Transfer ELO tokens to the presale contract">
+    The presale contract must hold ELO tokens before buyers can deposit. Transfer the presale allocation from the owner's wallet to the `ELOPresale` contract address.
+
+    <Warning>
+      The presale contract checks that its ELO balance is sufficient to cover tokens sold during `userDeposit`. If the presale contract holds no tokens, all deposit transactions will revert. Transfer ELO tokens to the presale contract before the presale window opens.
+    </Warning>
+  </Step>
+</Steps>
+
+## Post-deployment: withdrawing funds
+
+Once the presale ends successfully:
+
+1. Buyers call `userWithdrawTokens()` to claim their ELO tokens.
+2. The owner calls `purchaseICOCoin()` to withdraw the raised BNB.
+3. The owner calls `refundTokens()` to reclaim any unsold ELO tokens remaining in the contract.
+
+If the presale fails (ends without reaching softcap), buyers call `userWithdrawBaseTokens()` to reclaim their BNB. The owner's call to `userWithdrawBaseTokens()` also triggers the internal `ownerWithdrawTokens()` function, which returns all remaining ELO to the owner.

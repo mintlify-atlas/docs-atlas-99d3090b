@@ -1,0 +1,51 @@
+---
+title: "Fiat on-ramp"
+description: "Buy crypto with fiat currency using the Ramper integration"
+---
+
+The fiat on-ramp lets you purchase cryptocurrency directly with a credit card, debit card, or bank transfer without leaving ELO Token Demo. It is powered by **Ramper** (ramper.xyz), a fiat-to-crypto gateway embedded directly in the app.
+
+## Prerequisites
+
+- A connected Web3 wallet (see [Wallet integration](/features/wallet))
+- A credit card, debit card, or supported bank transfer method
+
+## How to use the on-ramp
+
+<Steps>
+  <Step title="Connect your wallet">
+    Click **Connect Wallet** and approve the connection. The Ramper widget uses your connected wallet address as the destination for purchased crypto.
+  </Step>
+
+  <Step title="Navigate to /onramp">
+    Go to `/onramp`. The page loads a Ramper iframe widget. The widget URL is fetched via the Moralis `fiat` plugin (`Moralis.Plugins.fiat.buy()`), which initializes the session and returns the embeddable widget URL.
+  </Step>
+
+  <Step title="Select a cryptocurrency and amount">
+    Inside the Ramper widget, choose the cryptocurrency you want to buy and enter the fiat amount. Ramper supports multiple currencies and payment methods depending on your region.
+  </Step>
+
+  <Step title="Enter payment details">
+    Provide your credit/debit card or bank transfer details within the Ramper widget. Ramper handles all payment processing and KYC requirements directly.
+  </Step>
+
+  <Step title="Confirm the purchase">
+    Review the transaction summary in the widget and confirm the purchase. Ramper processes the payment and sends the purchased crypto to your connected wallet address.
+  </Step>
+</Steps>
+
+## Technical details
+
+The on-ramp is implemented as a Moralis plugin integration in `src/components/Ramper.jsx`. The component:
+
+1. Checks whether `Moralis.Plugins.fiat` is available on mount
+2. Calls `Moralis.Plugins.fiat.buy()` with `disableTriggers: true` to fetch the widget URL
+3. Renders the URL in a sandboxed `<iframe>` with permissions for `accelerometer`, `autoplay`, `camera`, `gyroscope`, and `payment`
+
+<Note>
+  The Ramper widget requires the Moralis fiat plugin to be enabled in your Moralis server settings. If the plugin is not configured, the iframe will not load.
+</Note>
+
+<Tip>
+  Ramper supports buying crypto with fiat directly to a self-custody wallet, so funds go straight to your MetaMask or Rabby address rather than to a custodial exchange account.
+</Tip>
